@@ -8,6 +8,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+
+from users.models import User
 from .models import File
 from .serializers import FileSerializer
 
@@ -50,6 +52,19 @@ def upload_file_view(request):
     file = request.FILES.get('file')
     comment = request.data.get('comment', '')  #чтоб не упало все, если коммент не прописали
 
+    #через админ зону переход на юзера, загрузка файла в чужое хранилище
+    target_user_id = request.data.get('user_id')
+    if target_user_id and request.user.is_admin:
+        try:
+            target_user = User.objects.get(id=target_user_id)
+        except User.DoesNotExist:
+            return Response(
+                {'error': 'Пользователь не найден'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+    else:
+        target_user = request.user
+
     if not file:
         logger.warning(f'Юзер {request.user.username} не передал файл')
         return Response(
@@ -60,7 +75,7 @@ def upload_file_view(request):
     extension = os.path.splitext(file.name)[1]  #достаем расширение файла
     unique_name = f'{uuid.uuid4().hex}{extension}'  #склеиваем уникальное имя и расширение
 
-    user_folder = f'user_{request.user.id}'
+    user_folder = f'user_{target_user.id}'
     save_dir = os.path.join(settings.MEDIA_ROOT, user_folder)  #склейка путей безопасно для ОС
     os.makedirs(save_dir, exist_ok=True)  #создание полного пути, не упасть если папка уже создана
 
@@ -72,7 +87,7 @@ def upload_file_view(request):
 
     #сохраним в БД
     db_file = File.objects.create(
-        owner=request.user,
+        owner=target_user,
         original_name=file.name,
         size=file.size,
         comment=comment,

@@ -6,3 +6,5 @@ logs/
 .idea
 media/
 staticfiles/
+*.sqlite3
+db.sqlite3

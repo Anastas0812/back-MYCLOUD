@@ -1,5 +1,6 @@
 import uuid
 import os
+import secrets
 import logging
 from django.conf import settings
 from django.utils import timezone
@@ -92,7 +93,7 @@ def upload_file_view(request):
         size=file.size,
         comment=comment,
         file_path=f'{user_folder}/{unique_name}',
-        special_link=uuid.uuid4().hex
+        special_link=secrets.token_urlsafe(32)  #использует системный генератор случайных чисел, непредсказуем
     )
 
     serializer = FileSerializer(db_file)

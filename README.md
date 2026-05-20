@@ -54,10 +54,19 @@
 - Node.js 20+
 - Nginx
 
+### Ссылки на репо
+- Backend: https://github.com/Anastas0812/back-MYCLOUD
+- Frontend: https://github.com/Anastas0812/front-MYCLOUD
+
+### Открытые порты
+На сервере должны быть открыты порты: 
+- 80 (HTTP) 
+- 22 (SSH)
+
 ### Шаг 0. Подготовка сервера
 1. Создайте системного пользователя:
-``adduser ivan ``
-``usermod ivan -aG sudo``
+``adduser ваш_юзер ``
+``usermod ваш_юзер -aG sudo``
 
 2. Установите необходимые пакеты:
 ``sudo apt update``
@@ -67,17 +76,25 @@
 1. Создайте базу данных и пользователя:
 ``sudo -u postgres psql``
 ``CREATE DATABASE my_cloud;``
- ``ALTER USER postgres WITH PASSWORD 'ваш пароль'; ``
+ ``ALTER USER postgres WITH PASSWORD 'ваш_пароль_бд'; ``
  ``\q``
 
 ### Настройка переменных окружения
-Создайте файл `.env` в корне проекта:
+Для управления конфигурацией приложение использует пакет python-dotenv. 
+В коде инициализация выглядит следующим образом:
+```python
+from dotenv import load_dotenv
+load_dotenv()
+```
+
+Создайте файл `.env` в корне проекта (`/home/ваш_юзер/back-MYCLOUD/.env`):
 ``DB_NAME=my_cloud``
 ``DB_USER=postgres ``
-``DB_PASSWORD=ваш-пароль ``
+``DB_PASSWORD=ваш_пароль_бд ``
 ``DB_HOST=localhost ``
 ``DB_PORT=5432 ``
-``SECRET_KEY=ваш-секретный-ключ ``
+``SECRET_KEY=ваш_секретный_ключ #мин. 50 символов``
+*рекомендуется использовать генератор ключей, например https://djecrety.ir/*
 ``DEBUG=False``
 
 ### Создание суперпользователя
@@ -85,7 +102,7 @@
 После создания установите флаг `is_admin=True`:
 ``python manage.py shell``
 ``from users.models import User`` 
-``user = User.objects.get(username='ваш-логин')`` 
+``user = User.objects.get(username='ваш_логин')`` 
 ``user.is_admin = True user.save()`` 
 ``exit()``
 
@@ -96,12 +113,16 @@
 ``MyCloud After=network.target ``
 
 ``[Service] ``
-``User=ivan ``
+``User=ваш_юзер ``
 ``Group=www-data ``
-``WorkingDirectory=/home/ivan/back-MYCLOUD ````ExecStart=/home/ivan/back-MYCLOUD/env/bin/gunicorn \ ``
+``WorkingDirectory=/home/ваш_юзер/back-MYCLOUD ````ExecStart=/home/ваш_юзер/back-MYCLOUD/env/bin/gunicorn \ ``
 ``my_project_jango.wsgi:application \ ``
 ``--bind 127.0.0.1:8000 \ ``
-``--workers 3 [Install] ``
+``--workers 3 ``
+``Restart=always``
+``RestartSec=5``
+
+``[Install]``
 ``WantedBy=multi-user.target``
 
 ### Настройка Nginx
@@ -111,7 +132,7 @@
 		``server_name ВАШ-IP; ``
 		``client_max_body_size 100M; ``
 	``location / { ``
-		``root /home/ivan/front-MYCLOUD/dist;`` 
+		``root /home/ваш_юзер/front-MYCLOUD/dist;`` 
 		``index index.html;`` 
 		``try_files $uri $uri/ /index.html;``
 	``}``
@@ -121,10 +142,10 @@
 	``proxy_set_header X-Real-IP $remote_addr;`` 
 ``}`` 
 	``location /media/ {`` 
-		``alias /home/ivan/back-MYCLOUD/media/;``
+		``alias /home/ваш_юзер/back-MYCLOUD/media/;``
 	`` }`` 
 		``location /static/ {`` 
-			``alias /home/ivan/back-MYCLOUD/staticfiles/; ``
+			``alias /home/ваш_юзер/back-MYCLOUD/staticfiles/; ``
 		``}`` 
 	``}``
 
@@ -133,20 +154,21 @@
 
 ### Права доступа
 
-``chmod 755 /home/ivan ``
-``chmod -R 755 /home/ivan/front-MYCLOUD/dist ``
-``chmod -R 755 /home/ivan/back-MYCLOUD/staticfiles ``
-``chmod -R 755 /home/ivan/back-MYCLOUD/media``
+``chmod 755 /home/ваш_юзер ``
+``chmod -R 755 /home/ваш_юзер/front-MYCLOUD/dist ``
+``chmod -R 755 /home/ваш_юзер/back-MYCLOUD/staticfiles ``
+``chmod -R 755 /home/ваш_юзер/back-MYCLOUD/media``
 
 ### Известные особенности
 
 - Папка `logs/` создаётся вручную: `mkdir logs && touch logs/app.log` 
+- `media/`, `logs/`, `.env` не хранятся в git — создаются на сервере вручную
 - Копирование ссылки работает только на HTTPS — на HTTP используется запасной метод через `execCommand` (handleCopyLink)
 - Загрузка файлов ограничена 100МБ (настраивается в Nginx client_max_body_size  100M;)
 
 ### Шаг 1. Подготовка и сборка Фронтенда  
 Перед запуском бэкенда необходимо подготовить артефакты фронтенда. Инструкция по сборке статических файлов находится в README.md репозитория фронтенда.   
-После сборки артефакты (папка `dist`) должны быть размещены на сервере по пути, доступному веб-серверу Nginx (например, `/home/ivan/front-MYCLOUD/dist`).  
+После сборки артефакты (папка `dist`) должны быть размещены на сервере по пути, доступному веб-серверу Nginx (например, `/home/ваш_юзер/front-MYCLOUD/dist`).  
   
 ### Шаг 2. Развёртывание бэкенда на сервере  
 1. Клонируйте репозиторий бэкенда в домашнюю директорию:  

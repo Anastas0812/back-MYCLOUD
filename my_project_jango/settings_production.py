@@ -16,10 +16,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 SECURE_BROWSER_XSS_FILTER = True
 CSRF_TRUSTED_ORIGINS = [
-    'localhost',
-    '168.222.142.98',
+    'http://168.222.142.98'
 ]
 
 CORS_ALLOWED_ORIGINS = [
     'http://168.222.142.98',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'content-type',
+    'x-csrftoken',
 ]

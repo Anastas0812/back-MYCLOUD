@@ -129,7 +129,8 @@ DEBUG=False
   
 4. Создайте и активируйте виртуальное окружение Python:  
 ```bash  
-python3 -m venv envsource env/bin/activate
+python3 -m venv env
+source env/bin/activate
 ```  
 5. Установите необходимые зависимости:  
 ```bash  

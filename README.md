@@ -63,7 +63,8 @@
 1. Создайте системного пользователя:  
 ```bash  
 ssh root@ip_вашего_сервера
-adduser ваш_юзер password  
+adduser ваш_юзер 
+password  
 usermod ваш_юзер -aG sudo
 su ваш_юзер
 ```
@@ -74,7 +75,8 @@ cd ~
 sudo apt update
 password  
 sudo apt install python3-venv python3-pip postgresql nginx
-sudo systemctl start ngnixsudo systemctl status ngnix  
+sudo systemctl start ngnix
+sudo systemctl status ngnix  
 #должен быть active
 git --version
 ```
@@ -135,7 +137,8 @@ pip install -r requirements.txt
 ```  
 6. Выполните миграции базы данных и соберите статику Django:  
 ```bash 
-python manage.py migratepython manage.py collectstatic --noinput
+python manage.py migrate
+python manage.py collectstatic --noinput
 ```  
   
 ### Создание суперпользователя  
@@ -148,7 +151,10 @@ python manage.py shell
 ```  
 ```python  
 from users.models import User  
-user = User.objects.get(username='ваш_логин') user.is_admin = True user.save() exit()  
+user = User.objects.get(username='ваш_логин')
+user.is_admin = True 
+user.save()
+exit()  
 ```  
   
 ### Настройка Gunicorn  
@@ -169,8 +175,10 @@ MyCloud After=network.target
 User=ваш_юзер  
 Group=www-data  
 WorkingDirectory=/home/ваш_юзер/back-MYCLOUD  
-ExecStart=/home/ваш_юзер/back-MYCLOUD/env/bin/gunicorn \  
- my_project_jango.wsgi:application \ --bind 127.0.0.1:8000 \ --workers 3Restart=always  
+ExecStart=/home/ваш_юзер/back-MYCLOUD/env/bin/gunicorn \
+    my_project_jango.wsgi:application \ 
+          --bind 127.0.0.1:8000 \ 
+          --workers 3Restart=always  
 RestartSec=5  
   
 [Install]  
@@ -178,17 +186,22 @@ WantedBy=multi-user.target
 ```  
 3. Проверка  
 ```bash  
-sudo systemctl start gunicornsudo systemctl enable gunicornsudo systemctl status gunicorn  # должен быть active
+sudo systemctl start gunicorn
+sudo systemctl enable gunicorn
+sudo systemctl status gunicorn  
+# должен быть active
 ```  
   
 ### Работа с фронтендом  
 1. Склонируйте проект(фронтенд) с githhub:  
 ```bash  
-cd ~git clone {Frontend}cd front-MYCLOUD
+cd ~git clone {Frontend}
+cd front-MYCLOUD
 ```  
 2. Установка Node.js  
 ```bash  
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -sudo apt install nodejs
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install nodejs
 ```  
 3. Установка зависимостей, сборка  
 ```bash  
@@ -231,7 +244,9 @@ server {
 ```  
 2. Активация конфигов, проверка, что нет ошибок, перезапуск  
 ```bash  
-sudo ln -s /etc/nginx/sites-available/mycloud /etc/nginx/sites-enabled/sudo nginx -t sudo systemctl restart nginx
+sudo ln -s /etc/nginx/sites-available/mycloud /etc/nginx/sites-enabled/
+sudo nginx -t 
+sudo systemctl restart nginx
 ```  
   
 ### Права доступа  
@@ -254,9 +269,13 @@ chmod -R 755 /home/ваш_юзер/back-MYCLOUD/media
 ### Перезапуск nginx и gunicorn если что-то пошло не так  
 БЭКЕНД  
 ```bash  
-cd ~/back-MYCLOUDsource env/bin/activatesudo systemctl restart gunicorn
+cd ~/back-MYCLOUD
+source env/bin/activate
+sudo systemctl restart gunicorn
 ```  
 ФРОНТЕНД  
 ```bash  
-cd ~/front-MYCLOUDnpm run buildchmod -R 755 /home/anastas/front-MYCLOUD/distsudo systemctl restart nginx
+cd ~/front-MYCLOUD
+npm run buildchmod -R 755 /home/ваш_юзер/front-MYCLOUD/dist
+sudo systemctl restart nginx
 ```

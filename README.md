@@ -22,12 +22,12 @@
 ## Стек
 
 | Слой | Технология |
-| Frontend | React 19, CSS Modules, AI animated banner |
-| Backend | Django 6.0.5, Django REST Framework |
-| База данных | PostgreSQL |
-| Деплой | Ubuntu 26.0 (reg.ru), Nginx, Gunicorn |
-| Аутентификация/Авторизация | SessionAuthentication |
-| Тестирование | Pytest 9.0.3 |
+- | Frontend | React 19, CSS Modules, AI animated banner |
+- | Backend | Django 6.0.5, Django REST Framework |
+- | База данных | PostgreSQL |
+- | Деплой | Ubuntu 26.0 (reg.ru), Nginx, Gunicorn |
+- | Аутентификация/Авторизация | SessionAuthentication |
+- | Тестирование | Pytest 9.0.3 |
 
 ---
 
